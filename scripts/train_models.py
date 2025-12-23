@@ -7,7 +7,8 @@ import os
 import logging
 from datetime import datetime
 
-# Add src to path
+# Add src to path for development
+# Note: In production, install as a package or use PYTHONPATH
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.data_collection.collector import load_sample_threat_data

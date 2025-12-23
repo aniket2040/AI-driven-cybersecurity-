@@ -111,9 +111,10 @@ class ThreatPredictor:
         # Convert to DataFrame
         df = pd.DataFrame([data])
         
-        # Make prediction
-        prediction = self.model.predict(df)[0]
-        confidence = self.model.predict_proba(df)[0][1]
+        # Make prediction (get probabilities and derive prediction from them)
+        y_pred_proba = self.model.predict_proba(df)
+        confidence = y_pred_proba[0][1]
+        prediction = int(confidence >= 0.5)
         
         # Determine severity
         severity = self.determine_severity(confidence)

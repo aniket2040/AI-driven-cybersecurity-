@@ -12,13 +12,14 @@ print("="*80)
 print("CYBERSECURITY THREAT PREDICTION - VERIFICATION TEST")
 print("="*80)
 
-# Find the best model
+# Find the best model using file modification time
 model_files = glob.glob('models/trained/GradientBoosting*.pkl')
 if not model_files:
     print("❌ No trained model found!")
     sys.exit(1)
 
-latest_model = max(model_files, key=lambda x: x.split('_')[-1])
+import os
+latest_model = max(model_files, key=os.path.getmtime)
 print(f"\n✓ Loading model: {latest_model}")
 
 # Initialize predictor

@@ -99,6 +99,14 @@ class DatabaseManager:
             table_name: Name of the table
             data: Dictionary or list of dictionaries containing data
         """
+        # Validate table name against allowed tables
+        allowed_tables = {
+            'threats', 'network_traffic', 'predictions', 
+            'model_metrics', 'attack_signatures', 'alerts'
+        }
+        if table_name not in allowed_tables:
+            raise ValueError(f"Invalid table name: {table_name}")
+        
         if not isinstance(data, list):
             data = [data]
         

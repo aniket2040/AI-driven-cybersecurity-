@@ -8,7 +8,8 @@ import logging
 import sys
 import os
 
-# Add parent directory to path
+# Add parent directory to path for development
+# Note: In production, install as a package or use PYTHONPATH
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from prediction.predictor import ThreatPredictor, RealTimeThreatMonitor
