@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: cyber_threat_db
       POSTGRES_USER: cybersec_user
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme123}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Please set DB_PASSWORD environment variable}
     ports:
       - "5432:5432"
     volumes:
@@ -32,7 +32,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      DATABASE_URL: postgresql://cybersec_user:${DB_PASSWORD:-changeme123}@postgres:5432/cyber_threat_db
+      DATABASE_URL: postgresql://cybersec_user:${DB_PASSWORD:?Please set DB_PASSWORD environment variable}@postgres:5432/cyber_threat_db
       PYTHONUNBUFFERED: 1
     volumes:
       - ./models:/app/models
@@ -59,7 +59,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://cybersec_user:${DB_PASSWORD:-changeme123}@postgres:5432/cyber_threat_db
+      DATABASE_URL: postgresql://cybersec_user:${DB_PASSWORD:?Please set DB_PASSWORD environment variable}@postgres:5432/cyber_threat_db
       PYTHONUNBUFFERED: 1
     volumes:
       - ./models:/app/models

@@ -9,6 +9,9 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Constants
+PERCENTAGE_MULTIPLIER = 100  # For converting decimal to percentage
+
 
 class SecurityEventSummarizer:
     """
@@ -378,7 +381,7 @@ class SecurityEventSummarizer:
         Returns:
             Executive summary string
         """
-        threat_rate = (threat_count / total * 100) if total > 0 else 0
+        threat_rate = (threat_count / total * PERCENTAGE_MULTIPLIER) if total > 0 else 0
         
         if severity_counts['HIGH'] > 0:
             status = "🚨 CRITICAL ALERT"
@@ -550,7 +553,7 @@ class ThreatSummaryAgent:
             if e.get('is_threat', False)
         )
         
-        return f"{(threat_count / len(self.event_history) * 100):.1f}%"
+        return f"{(threat_count / len(self.event_history) * PERCENTAGE_MULTIPLIER):.1f}%"
     
     def clear_history(self):
         """Clear event history."""
