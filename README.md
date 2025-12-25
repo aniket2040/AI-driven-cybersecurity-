@@ -66,11 +66,31 @@ AI-driven-cybersecurity/
 - **Batch Processing**: Efficient bulk analysis
 - **Confidence Scoring**: Probability-based predictions
 
+### AI-Powered Features ⭐ NEW
+- **AI Security Agent**: Automatically summarizes complex security events in simple language
+- **Threat Intelligence Reports**: Generates executive-level threat summaries
+- **Actionable Recommendations**: AI-driven security response guidance
+- **Attack Type Inference**: Automatically identifies attack patterns
+
+### Real-time Dashboard 📊 NEW
+- **Live Threat Monitoring**: Real-time visualization of security threats
+- **Interactive Dashboard**: Web-based interface for threat analysis
+- **Active Alerts Display**: Immediate notification of critical threats
+- **Statistical Visualizations**: Comprehensive threat analytics and trends
+- **Auto-refresh**: Continuous updates every 5 seconds
+
 ### API & Monitoring
 - **RESTful API**: Easy integration with existing systems
 - **Real-time Alerts**: Immediate notification of threats
 - **Statistics Dashboard**: Comprehensive threat analytics
 - **Configurable Thresholds**: Customizable severity levels
+- **AI Summary Endpoints**: Get human-readable threat explanations
+
+### Docker Deployment 🐳 NEW
+- **Containerized Architecture**: Full Docker and Docker Compose support
+- **Multi-service Setup**: API, Dashboard, and Database in containers
+- **Easy Deployment**: One-command deployment with docker-compose
+- **Production-ready**: Health checks, logging, and monitoring included
 
 ## 📋 Prerequisites
 
@@ -114,6 +134,26 @@ AI-driven-cybersecurity/
 
 ## 📚 Usage
 
+### Quick Start with Docker 🐳 (Recommended)
+
+The fastest way to get started:
+
+```bash
+# Start all services (API, Dashboard, Database)
+docker-compose up -d
+
+# Train models (first time only)
+docker-compose exec api python scripts/train_models.py
+
+# Access the dashboard
+open http://localhost:8000
+
+# Access the API
+curl http://localhost:5000/health
+```
+
+See [Docker Deployment Guide](docs/DOCKER_DEPLOYMENT.md) for detailed instructions.
+
 ### Training Models
 
 Train all models using the sample dataset:
@@ -136,6 +176,16 @@ Start the threat detection API:
 ```bash
 python api/app.py --model models/trained/RandomForest_XXXXXX.pkl --host 0.0.0.0 --port 5000
 ```
+
+### Running the Dashboard 📊
+
+Start the real-time monitoring dashboard:
+
+```bash
+python dashboard/app.py --model models/trained/RandomForest_XXXXXX.pkl --host 0.0.0.0 --port 8000
+```
+
+Then open your browser to `http://localhost:8000` to view the interactive dashboard.
 
 ### API Endpoints
 
@@ -160,6 +210,32 @@ Content-Type: application/json
   "tcp_flags": "SYN"
 }
 ```
+
+#### Prediction with AI Summary ⭐ NEW
+```bash
+POST /api/v1/predict/summarize
+Content-Type: application/json
+
+{
+  "source_ip": "192.168.1.100",
+  "destination_ip": "10.0.0.50",
+  "source_port": 12345,
+  "destination_port": 443,
+  "protocol": "TCP",
+  "packet_size": 1024,
+  "payload_size": 800,
+  "tcp_flags": "SYN"
+}
+```
+
+Returns threat prediction with AI-generated human-readable summary and recommendations.
+
+#### Generate Threat Intelligence Report ⭐ NEW
+```bash
+GET /api/v1/report/generate?include_history=true
+```
+
+Returns comprehensive threat intelligence report with executive summary and recommendations.
 
 #### Batch Predictions
 ```bash
