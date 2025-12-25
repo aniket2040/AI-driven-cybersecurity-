@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: cyber_threat_db
+    environment:
+      POSTGRES_DB: cyber_threat_db
+      POSTGRES_USER: cyberuser
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-SecurePassword123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - cyber_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cyberuser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Service
+  api:
+    build: .
+    container_name: cyber_api
+    command: python api/app.py --host 0.0.0.0 --port 5000
+    environment:
+      DATABASE_URL: postgresql://cyberuser:${DB_PASSWORD:-SecurePassword123}@postgres:5432/cyber_threat_db
+      PYTHONPATH: /app
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    ports:
+      - "5000:5000"
+    networks:
+      - cyber_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Dashboard Service
+  dashboard:
+    build: .
+    container_name: cyber_dashboard
+    command: python dashboard/app.py --host 0.0.0.0 --port 8080
+    environment:
+      API_BASE_URL: http://api:5000/api/v1
+    ports:
+      - "8080:8080"
+    networks:
+      - cyber_network
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # NATEM Agent (Network Attack Threat Event Monitor)
+  natem_agent:
+    build: .
+    container_name: natem_agent
+    command: python scripts/natem_agent.py
+    environment:
+      DATABASE_URL: postgresql://cyberuser:${DB_PASSWORD:-SecurePassword123}@postgres:5432/cyber_threat_db
+      API_URL: http://api:5000/api/v1
+      PYTHONPATH: /app
+    volumes:
+      - ./data:/app/data
+    networks:
+      - cyber_network
+    depends_on:
+      - api
+      - postgres
+    restart: unless-stopped
+
+networks:
+  cyber_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

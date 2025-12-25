@@ -13,6 +13,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from prediction.predictor import ThreatPredictor, RealTimeThreatMonitor
+from ai_agent.summarizer import SecurityEventSummarizer
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,9 +21,10 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)
 
-# Initialize predictor and monitor
+# Initialize predictor, monitor, and AI summarizer
 predictor = None
 monitor = None
+summarizer = SecurityEventSummarizer()
 
 
 def initialize_service(model_path: str = None):
@@ -238,6 +240,110 @@ def update_thresholds():
     
     except Exception as e:
         logger.error(f"Error updating thresholds: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v1/summarize', methods=['POST'])
+def summarize_threat():
+    """
+    Generate an AI summary of a security threat.
+    
+    Expected JSON payload: same as /predict endpoint
+    Returns: Human-readable summary with recommendations
+    """
+    if predictor is None or predictor.model is None:
+        return jsonify({'error': 'Model not loaded'}), 503
+    
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        # Make prediction first
+        prediction_result = predictor.predict_single(data)
+        
+        # Generate AI summary
+        summary = summarizer.summarize_threat(prediction_result)
+        
+        return jsonify(summary), 200
+    
+    except Exception as e:
+        logger.error(f"Summarization error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v1/summarize/batch', methods=['POST'])
+def summarize_batch():
+    """
+    Generate AI summaries for multiple security events.
+    
+    Expected JSON payload:
+    {
+        "data": [
+            {"source_ip": "...", "destination_ip": "...", ...},
+            {"source_ip": "...", "destination_ip": "...", ...}
+        ]
+    }
+    """
+    if predictor is None or predictor.model is None:
+        return jsonify({'error': 'Model not loaded'}), 503
+    
+    try:
+        payload = request.get_json()
+        
+        if not payload or 'data' not in payload:
+            return jsonify({'error': 'Invalid payload format'}), 400
+        
+        data_list = payload['data']
+        
+        if not isinstance(data_list, list):
+            return jsonify({'error': 'Data must be a list'}), 400
+        
+        # Make batch predictions
+        predictions = predictor.predict_batch(data_list)
+        
+        # Generate batch summary
+        batch_summary = summarizer.summarize_batch(predictions)
+        
+        return jsonify(batch_summary), 200
+    
+    except Exception as e:
+        logger.error(f"Batch summarization error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v1/summaries', methods=['GET'])
+def get_summaries():
+    """
+    Get cached AI summaries.
+    
+    Query parameters:
+    - limit: Maximum number of summaries to return (default: 100)
+    """
+    try:
+        limit = request.args.get('limit', 100, type=int)
+        summaries = summarizer.get_summary_cache(limit)
+        
+        return jsonify({
+            'summaries': summaries,
+            'count': len(summaries)
+        }), 200
+    
+    except Exception as e:
+        logger.error(f"Error getting summaries: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v1/summaries/clear', methods=['POST'])
+def clear_summaries():
+    """Clear the AI summary cache."""
+    try:
+        summarizer.clear_cache()
+        return jsonify({'message': 'Summary cache cleared successfully'}), 200
+    
+    except Exception as e:
+        logger.error(f"Error clearing summaries: {e}")
         return jsonify({'error': str(e)}), 500
 
 
