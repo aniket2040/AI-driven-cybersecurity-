@@ -1,7 +1,8 @@
 // Dashboard JavaScript - Real-time Updates and Visualizations
 
 // Configuration
-const API_BASE_URL = 'http://localhost:5000/api/v1';
+// API URL can be configured via environment or defaults to localhost
+const API_BASE_URL = window.API_BASE_URL || 'http://localhost:5000/api/v1';
 const UPDATE_INTERVAL = 5000; // Update every 5 seconds
 
 // Chart instances

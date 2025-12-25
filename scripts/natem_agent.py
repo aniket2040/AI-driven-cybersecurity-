@@ -91,11 +91,14 @@ class NATEMAgent:
         """
         Send traffic data to the API for analysis with AI summary.
         
+        The summarize endpoint performs threat prediction internally and returns
+        both the prediction result and an AI-generated human-readable summary.
+        
         Args:
             traffic_data: Network traffic data
             
         Returns:
-            API response with prediction and summary
+            API response containing AI summary, threat prediction, and recommendations
         """
         try:
             # Use the summarize endpoint to get both prediction and AI summary

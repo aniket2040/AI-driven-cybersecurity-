@@ -80,7 +80,9 @@ class TestSecurityEventSummarizer:
         
         assert 'summary' in result
         assert result['threat_detected'] is False
-        assert '✅' in result['summary'] or 'NORMAL' in result['summary']
+        # Check for benign indicators rather than specific text
+        assert result['threat_detected'] == False
+        assert result['severity_description'] == 'INFORMATIONAL - For awareness only'
     
     def test_summarize_batch(self):
         """Test batch summarization."""

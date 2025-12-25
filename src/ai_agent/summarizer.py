@@ -178,16 +178,25 @@ class SecurityEventSummarizer:
         """
         Infer the type of attack based on traffic patterns.
         
-        This is a simplified heuristic-based approach. In production,
-        this would use more sophisticated ML-based classification.
+        This is a heuristic-based approach for demonstration purposes.
+        In production, consider using:
+        - ML-based multi-class classification for attack types
+        - Signature-based detection with updated threat intelligence
+        - Behavior analysis using sequential models (LSTM/RNN)
+        - Integration with threat intelligence feeds
+        
+        The current implementation provides reasonable accuracy for common attacks
+        but should be enhanced for production deployments.
         """
         dest_port = input_data.get('destination_port', 0)
         protocol = input_data.get('protocol', '').upper()
         packet_size = input_data.get('packet_size', 0)
         tcp_flags = input_data.get('tcp_flags', '').upper()
         
-        # Port scanning detection
-        if tcp_flags in ['SYN', 'FIN', 'NULL', 'XMAS']:
+        # Port scanning detection - check for common scan flags
+        # Support both single flags and comma-separated combinations
+        scan_flags = ['SYN', 'FIN', 'NULL', 'XMAS']
+        if any(flag in tcp_flags for flag in scan_flags):
             return 'port_scan'
         
         # Potential DDoS based on small packets

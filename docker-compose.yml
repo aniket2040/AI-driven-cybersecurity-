@@ -8,7 +8,9 @@ services:
     environment:
       POSTGRES_DB: cyber_threat_db
       POSTGRES_USER: cyberuser
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-SecurePassword123}
+      # IMPORTANT: Change the default password before production deployment
+      # Use strong passwords with a mix of uppercase, lowercase, numbers, and symbols
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ChangeThisSecurePassword!2024}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
@@ -28,7 +30,7 @@ services:
     container_name: cyber_api
     command: python api/app.py --host 0.0.0.0 --port 5000
     environment:
-      DATABASE_URL: postgresql://cyberuser:${DB_PASSWORD:-SecurePassword123}@postgres:5432/cyber_threat_db
+      DATABASE_URL: postgresql://cyberuser:${DB_PASSWORD:-ChangeThisSecurePassword!2024}@postgres:5432/cyber_threat_db
       PYTHONPATH: /app
     volumes:
       - ./models:/app/models
@@ -63,7 +65,7 @@ services:
     container_name: natem_agent
     command: python scripts/natem_agent.py
     environment:
-      DATABASE_URL: postgresql://cyberuser:${DB_PASSWORD:-SecurePassword123}@postgres:5432/cyber_threat_db
+      DATABASE_URL: postgresql://cyberuser:${DB_PASSWORD:-ChangeThisSecurePassword!2024}@postgres:5432/cyber_threat_db
       API_URL: http://api:5000/api/v1
       PYTHONPATH: /app
     volumes:
