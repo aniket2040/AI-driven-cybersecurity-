@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Threat Detection Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <h1>🛡️ AI-Driven Cybersecurity Dashboard</h1>
+            <div class="header-info">
+                <span id="current-time"></span>
+                <span id="status-indicator" class="status-active">● Live</span>
+            </div>
+        </header>
+
+        <!-- Alert Banner -->
+        <div id="alert-banner" class="alert-banner hidden">
+            <span id="alert-message"></span>
+            <button onclick="dismissAlert()">✕</button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <div class="card-content">
+                    <h3>Total Events</h3>
+                    <p class="card-value" id="total-events">0</p>
+                    <span class="card-subtitle">Last 24 hours</span>
+                </div>
+            </div>
+
+            <div class="card card-danger">
+                <div class="card-icon">🚨</div>
+                <div class="card-content">
+                    <h3>Threats Detected</h3>
+                    <p class="card-value" id="threat-count">0</p>
+                    <span class="card-subtitle" id="threat-percentage">0% of traffic</span>
+                </div>
+            </div>
+
+            <div class="card card-warning">
+                <div class="card-icon">⚠️</div>
+                <div class="card-content">
+                    <h3>High Severity</h3>
+                    <p class="card-value" id="high-severity">0</p>
+                    <span class="card-subtitle">Requires immediate action</span>
+                </div>
+            </div>
+
+            <div class="card card-success">
+                <div class="card-icon">✅</div>
+                <div class="card-content">
+                    <h3>Detection Accuracy</h3>
+                    <p class="card-value" id="accuracy">95.2%</p>
+                    <span class="card-subtitle">Model performance</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- Threat Timeline Chart -->
+                <div class="panel">
+                    <h2>📈 Threat Activity Timeline</h2>
+                    <canvas id="threat-timeline-chart"></canvas>
+                </div>
+
+                <!-- Severity Distribution -->
+                <div class="panel">
+                    <h2>🎯 Severity Distribution</h2>
+                    <canvas id="severity-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- Active Alerts -->
+                <div class="panel panel-alerts">
+                    <h2>🔔 Active Alerts</h2>
+                    <div id="alerts-container" class="alerts-list">
+                        <p class="no-data">No active alerts</p>
+                    </div>
+                </div>
+
+                <!-- Recent Threats -->
+                <div class="panel">
+                    <h2>⚡ Recent Threats</h2>
+                    <div id="recent-threats" class="threats-list">
+                        <p class="no-data">No recent threats</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Summaries Section -->
+        <div class="ai-summaries-section">
+            <div class="panel">
+                <h2>🤖 AI Security Analysis</h2>
+                <div id="ai-summaries" class="ai-summaries-container">
+                    <p class="no-data">Waiting for security events...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Section: Top Sources and Targets -->
+        <div class="bottom-section">
+            <div class="panel">
+                <h2>📍 Top Threat Sources</h2>
+                <div id="top-sources" class="ip-list">
+                    <p class="no-data">No data available</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>🎯 Top Targets</h2>
+                <div id="top-targets" class="ip-list">
+                    <p class="no-data">No data available</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>🌐 Protocol Distribution</h2>
+                <canvas id="protocol-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p>AI-Driven Cybersecurity Platform | Last Updated: <span id="last-update">--</span></p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</body>
+</html>
