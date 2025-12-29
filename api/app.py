@@ -13,6 +13,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from prediction.predictor import ThreatPredictor, RealTimeThreatMonitor
+from ai_agent.summarizer import ThreatSummaryAgent
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,9 +21,10 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)
 
-# Initialize predictor and monitor
+# Initialize predictor, monitor, and AI agent
 predictor = None
 monitor = None
+ai_agent = None
 
 
 def initialize_service(model_path: str = None):
@@ -32,12 +34,13 @@ def initialize_service(model_path: str = None):
     Args:
         model_path: Path to trained model
     """
-    global predictor, monitor
+    global predictor, monitor, ai_agent
     
     try:
         predictor = ThreatPredictor(model_path=model_path)
         monitor = RealTimeThreatMonitor(predictor)
-        logger.info("Threat prediction service initialized")
+        ai_agent = ThreatSummaryAgent()
+        logger.info("Threat prediction service with AI agent initialized")
     except Exception as e:
         logger.error(f"Error initializing service: {e}")
 
@@ -238,6 +241,55 @@ def update_thresholds():
     
     except Exception as e:
         logger.error(f"Error updating thresholds: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v1/predict/summarize', methods=['POST'])
+def predict_with_summary():
+    """
+    Predict threat and generate AI summary.
+    
+    Expected JSON payload: same as /predict endpoint
+    """
+    if predictor is None or predictor.model is None:
+        return jsonify({'error': 'Model not loaded'}), 503
+    
+    if ai_agent is None:
+        return jsonify({'error': 'AI agent not initialized'}), 503
+    
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        # Make prediction
+        result = predictor.predict_single(data)
+        
+        # Generate AI summary
+        summary = ai_agent.analyze_and_summarize(result)
+        
+        return jsonify(summary), 200
+    
+    except Exception as e:
+        logger.error(f"Prediction with summary error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v1/report/generate', methods=['GET'])
+def generate_threat_report():
+    """Generate comprehensive threat intelligence report."""
+    if ai_agent is None:
+        return jsonify({'error': 'AI agent not initialized'}), 503
+    
+    try:
+        include_history = request.args.get('include_history', 'true').lower() == 'true'
+        report = ai_agent.generate_report(include_history=include_history)
+        
+        return jsonify(report), 200
+    
+    except Exception as e:
+        logger.error(f"Report generation error: {e}")
         return jsonify({'error': str(e)}), 500
 
 
